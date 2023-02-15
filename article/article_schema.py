@@ -1,15 +1,28 @@
 import strawberry
+import typing
 from typing import List
 from article.models import Article, Author, Tag
 from users.models import CustomUser as User
-from strawberry.file_uploads import Upload
 
 
+from strawberry.permission import BasePermission
+from strawberry.types import Info
+
+
+
+class IsAuthenticated(BasePermission):
+    message = "User is not authenticated"
+
+    # This method can also be async!
+    def has_permission(self, source: typing.Any, info: Info, **kwargs) -> bool:
+
+        return False
+    
 @strawberry.type
 class AuthorType:
     id: strawberry.ID
     user: strawberry.ID
-    bio: str
+    bio: str = strawberry.field(permission_classes=[IsAuthenticated])
     picture: str
 
 @strawberry.type
@@ -19,7 +32,7 @@ class TagType:
 
 @strawberry.type
 class ArticleType:
-    id: strawberry.ID
+    id: strawberry.ID =  strawberry.field(permission_classes=[IsAuthenticated])
     title: str
     slug: str
     content: str
@@ -58,7 +71,7 @@ class Mutation:
     @strawberry.mutation
     def create_author(self, user: int, bio: str, picture: str) -> AuthorType:
         user = User.objects.get(id=user)
-        author = Author(user=user, picture=picture)   
+        author = Author(user=user, bio=bio, picture=picture)   
         
         author.save()
 

@@ -18,10 +18,11 @@ from django.urls import path
 from strawberry.django.views import GraphQLView
 from users.schema import schema
 from article.article_schema import schema as article_schema
+from article.views import graphql_view
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("graphql/", GraphQLView.as_view(schema=schema)),
-    path("graphql/articles", GraphQLView.as_view(schema=article_schema)),
+    path("graphql/articles", graphql_view),
 ]
